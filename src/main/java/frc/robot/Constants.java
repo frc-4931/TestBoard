@@ -18,7 +18,7 @@ public final class Constants {
   }
 
   public static class SingleMotorConstants {
-    public static final int SINGLE_MOTOR_ID = 1;
+    public static final int SINGLE_MOTOR_ID = 10;
     public static final double SINGLE_MOTOR_VOLTAGE_COMP = 10.0;
     public static final int SINGLE_MOTOR_CURRENT_LIMIT = 60;
   }

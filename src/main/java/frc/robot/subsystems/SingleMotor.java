@@ -34,7 +34,8 @@ public class SingleMotor extends SubsystemBase {
         SparkMaxConfig practiceConfig = new SparkMaxConfig();
         practiceConfig.voltageCompensation(SingleMotorConstants.SINGLE_MOTOR_VOLTAGE_COMP);
         practiceConfig.smartCurrentLimit(SingleMotorConstants.SINGLE_MOTOR_CURRENT_LIMIT);
-        practiceConfig.idleMode(IdleMode.kBrake);
+        // practiceConfig.idleMode(IdleMode.kBrake);
+        practiceConfig.idleMode(IdleMode.kCoast);
         SingleMotor.configure(practiceConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
@@ -52,20 +53,33 @@ public class SingleMotor extends SubsystemBase {
         SingleMotor.set(speed);
     }
 
-    public Command BackwardSlowSpin() {
-        return this.runOnce(() -> { runSingleMotor(-.15);});
+    // Change your command methods to use runEnd
+    public Command ForwordSpin() {
+        return this.runEnd(
+            () -> runSingleMotor(0.5), // Run at 50% speed while held
+            () -> runSingleMotor(0.0)  // Stop the motor when released
+        );
     }
 
-    public Command SpinStop() {
-        return this.runOnce(() -> { runSingleMotor(0);});
-    }
-
-    public Command ForwordSlowSpin() {
-        return this.runOnce(() -> { runSingleMotor(15);});
-    }
-    
     public Command BackwardFastSpin() {
-        return this.runOnce(() -> { runSingleMotor(5);});
+        return this.runEnd(
+            () -> runSingleMotor(-0.6), // Run reverse while held
+            () -> runSingleMotor(0.0)   // Stop the motor when released
+        );
+    }
+
+    public Command BackwardSlowSpin() {
+        return this.runEnd(
+            () -> runSingleMotor(-0.2),
+            () -> runSingleMotor(0.0)
+        );
+    }
+
+    // The run once will have the motor continue to run until commanded to stop
+    public Command ContinuousSlowForwardSpin() {
+        return this.runOnce(
+            () -> runSingleMotor(-0.2)
+        );
     }
 
 }
