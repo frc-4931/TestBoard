@@ -13,19 +13,19 @@ import frc.robot.Constants.DutyCycleMotorConstants;
 
 public class DutyCycleMotor extends SubsystemBase {
 
-    private final SparkMax DutyCycleMotor;
+    private final SparkMax dutyCycleMotor;
     /**
      * This subsytem that controls the motor.
      */
     public DutyCycleMotor () {
 
         // Set up the motor as a brushed motor
-        DutyCycleMotor = new SparkMax(DutyCycleMotorConstants.SINGLE_MOTOR_ID, MotorType.kBrushless);
+        dutyCycleMotor = new SparkMax(DutyCycleMotorConstants.SINGLE_MOTOR_ID, MotorType.kBrushless);
 
         // Set can timeout. Because this project only sets parameters once on
         // construction, the timeout can be long without blocking robot operation. Code
         // which sets or gets parameters during operation may need a shorter timeout.
-        DutyCycleMotor.setCANTimeout(250);
+        dutyCycleMotor.setCANTimeout(250);
 
         // Create and apply configuration for motor. Voltage compensation helps
         // the motor behave the same as the battery
@@ -36,7 +36,7 @@ public class DutyCycleMotor extends SubsystemBase {
         practiceConfig.smartCurrentLimit(DutyCycleMotorConstants.SINGLE_MOTOR_CURRENT_LIMIT);
         // practiceConfig.idleMode(IdleMode.kBrake);
         practiceConfig.idleMode(IdleMode.kCoast);
-        DutyCycleMotor.configure(practiceConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        dutyCycleMotor.configure(practiceConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class DutyCycleMotor extends SubsystemBase {
      * @param speedmotor speed from -1.0 to 1, with 0 stopping it
      */
     public void runDutyCycleMotor(double speed){
-        DutyCycleMotor.set(speed);
+        dutyCycleMotor.set(speed);
     }
 
     // Change your command methods to use runEnd

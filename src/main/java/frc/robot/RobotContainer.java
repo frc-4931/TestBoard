@@ -9,6 +9,9 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.DutyCycleMotor;
+
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -17,6 +20,12 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.subsystems.VelocityControlledMotor;
 
+enum ControlType {
+DUTY_CYCLE,         // Percent output (-1.0 to 1.0)
+VELOCITY_CONTROL,   // RPM based
+POSITION_CONTROL    // Rotation/Encoder based
+}
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -24,10 +33,16 @@ import frc.robot.subsystems.VelocityControlledMotor;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  // Select the type of motor to use
+  private final ControlType controlType = ControlType.DUTY_CYCLE;
+
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private final VelocityControlledMotor velocityControlledMotor = new VelocityControlledMotor();
-//   private final dutyCycleMotor dutyCycleMotor = new dutyCycleMotor();
+  private VelocityControlledMotor velocityControlledMotor;
+  private DutyCycleMotor dutyCycleMotor;
+
+//   private final VelocityControlledMotor velocityControlledMotor = new VelocityControlledMotor();
+//   private final DutyCycleMotor dutyCycleMotor = new DutyCycleMotor();
   
   final         CommandXboxController driverXbox = new CommandXboxController(0);
 
@@ -37,6 +52,17 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    switch (controlType) {
+      case DUTY_CYCLE:
+        dutyCycleMotor = new DutyCycleMotor();
+        break;
+      case VELOCITY_CONTROL:
+        // Note: requires PID controller setup on the SparkMax
+        velocityControlledMotor = new VelocityControlledMotor();
+        break;
+      case POSITION_CONTROL:
+          break;
+    }
     // Configure the trigger bindings
     configureBindings();
   }
@@ -57,29 +83,39 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-    // driverXbox.a().whileTrue(dutyCycleMotor.ForwordSpin());
-    // driverXbox.b().whileTrue(dutyCycleMotor.BackwardSlowSpin());
-    // driverXbox.x().whileTrue(dutyCycleMotor.BackwardFastSpin());
-    driverXbox.a().whileTrue(velocityControlledMotor.BackwardSlowSpin());
-    driverXbox.b().whileTrue(velocityControlledMotor.ForwordSlowSpin());
-    // These will only execute if the Robot is physically put into "Test Mode"
-      driverXbox.povUp().whileTrue(
+        switch (controlType) {
+      case DUTY_CYCLE:
+        driverXbox.a().whileTrue(dutyCycleMotor.ForwordSpin());
+        driverXbox.b().whileTrue(dutyCycleMotor.BackwardSlowSpin());
+        driverXbox.x().whileTrue(dutyCycleMotor.BackwardFastSpin());
+        break;
+      case VELOCITY_CONTROL:
+        driverXbox.a().whileTrue(velocityControlledMotor.BackwardSlowSpin());
+        driverXbox.b().whileTrue(velocityControlledMotor.ForwordSlowSpin());
+        driverXbox.povUp().whileTrue(
           velocityControlledMotor.sysIdQuasistatic(Direction.kForward)
           .onlyIf(DriverStation::isTest)
-      );
-      driverXbox.povDown().whileTrue(
+          );
+        driverXbox.povDown().whileTrue(
           velocityControlledMotor.sysIdQuasistatic(Direction.kReverse)
           .onlyIf(DriverStation::isTest)
-      );
-      driverXbox.povRight().whileTrue(
+          );
+        driverXbox.povRight().whileTrue(
           velocityControlledMotor.sysIdDynamic(Direction.kForward)
           .onlyIf(DriverStation::isTest)
-      );
-      driverXbox.povLeft().whileTrue(
+          );
+        driverXbox.povLeft().whileTrue(
           velocityControlledMotor.sysIdDynamic(Direction.kReverse)
           .onlyIf(DriverStation::isTest)
-      );
+          );
+        break;
+      case POSITION_CONTROL:
+          break;
+    }
+    // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+
+    // These will only execute if the Robot is physically put into "Test Mode"
+
   }
 
   /**
