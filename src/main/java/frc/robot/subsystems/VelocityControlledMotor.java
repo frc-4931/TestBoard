@@ -32,12 +32,12 @@ public class VelocityControlledMotor extends SubsystemBase {
         pidController = controlledMotor.getClosedLoopController();
 
         // 2. Configure Leader
-        SparkMaxConfig leaderConfig = new SparkMaxConfig();
-        leaderConfig.voltageCompensation(ControlledMotorConstants.MOTOR_VOLTAGE_COMP);
-        leaderConfig.smartCurrentLimit(ControlledMotorConstants.MOTOR_CURRENT_LIMIT);
-        // leaderConfig.idleMode(IdleMode.kBrake);
-        leaderConfig.idleMode(IdleMode.kCoast);
-        leaderConfig.closedLoop
+        SparkMaxConfig motorConfig = new SparkMaxConfig();
+        motorConfig.voltageCompensation(ControlledMotorConstants.MOTOR_VOLTAGE_COMP);
+        motorConfig.smartCurrentLimit(ControlledMotorConstants.MOTOR_CURRENT_LIMIT);
+        // motorConfig.idleMode(IdleMode.kBrake);
+        motorConfig.idleMode(IdleMode.kCoast);
+        motorConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             // The PID values (kP, kI, kD)
             .pid(0.00066472, 0, 0, ClosedLoopSlot.kSlot0)
@@ -47,7 +47,7 @@ public class VelocityControlledMotor extends SubsystemBase {
             .kS(0.14139, ClosedLoopSlot.kSlot0)
             .kV(0.12189, ClosedLoopSlot.kSlot0);
 
-        controlledMotor.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        controlledMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         // 3. SysId Routine Setup
         m_sysIdRoutine = new SysIdRoutine(
