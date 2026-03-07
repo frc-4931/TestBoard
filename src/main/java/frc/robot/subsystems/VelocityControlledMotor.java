@@ -19,13 +19,13 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
-public class ControlledMotor extends SubsystemBase {
+public class VelocityControlledMotor extends SubsystemBase {
     private final SparkMax controlledMotor;
     
     private final SparkClosedLoopController pidController;
     private final SysIdRoutine m_sysIdRoutine;
 
-    public ControlledMotor() {
+    public VelocityControlledMotor() {
         // 1. Initialize Motor
         controlledMotor = new SparkMax(ControlledMotorConstants.MOTOR_ID, MotorType.kBrushless);        
         
@@ -35,16 +35,17 @@ public class ControlledMotor extends SubsystemBase {
         SparkMaxConfig leaderConfig = new SparkMaxConfig();
         leaderConfig.voltageCompensation(ControlledMotorConstants.MOTOR_VOLTAGE_COMP);
         leaderConfig.smartCurrentLimit(ControlledMotorConstants.MOTOR_CURRENT_LIMIT);
-        leaderConfig.idleMode(IdleMode.kBrake);
+        // leaderConfig.idleMode(IdleMode.kBrake);
+        leaderConfig.idleMode(IdleMode.kCoast);
         leaderConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             // The PID values (kP, kI, kD)
-            .pid(0.056503, 0, 0, ClosedLoopSlot.kSlot0)
+            .pid(0.00066472, 0, 0, ClosedLoopSlot.kSlot0)
             // The Feedforward values (kS, kV) from SysId
             .velocityFF(0.0) // Usually set to 0 when using kS/kV directly
             .feedForward
-            .kS(0.07054, ClosedLoopSlot.kSlot0)
-            .kV(0.12245, ClosedLoopSlot.kSlot0);
+            .kS(0.14139, ClosedLoopSlot.kSlot0)
+            .kV(0.12189, ClosedLoopSlot.kSlot0);
 
         controlledMotor.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -83,7 +84,7 @@ public class ControlledMotor extends SubsystemBase {
     }
 
     public Command BackwardSlowSpin() {
-        return this.runOnce(() -> { runSecondMotor(-.15);});
+        return this.runEnd(() -> runSecondMotor(-2000),() -> runSecondMotor(0));
     }
 
     public Command SpinStop() {
@@ -95,7 +96,7 @@ public class ControlledMotor extends SubsystemBase {
     }
 
     public Command ForwordSlowSpin() {
-        return this.runOnce(() -> { runSecondMotor(.15);});
+        return this.runOnce(() -> { runSecondMotor(2000);});
     }
 
     public void setVelocity(double rpm) {

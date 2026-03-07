@@ -9,34 +9,34 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.SingleMotorConstants;
+import frc.robot.Constants.DutyCycleMotorConstants;
 
-public class SingleMotor extends SubsystemBase {
+public class DutyCycleMotor extends SubsystemBase {
 
-    private final SparkMax SingleMotor;
+    private final SparkMax DutyCycleMotor;
     /**
      * This subsytem that controls the motor.
      */
-    public SingleMotor () {
+    public DutyCycleMotor () {
 
         // Set up the motor as a brushed motor
-        SingleMotor = new SparkMax(SingleMotorConstants.SINGLE_MOTOR_ID, MotorType.kBrushless);
+        DutyCycleMotor = new SparkMax(DutyCycleMotorConstants.SINGLE_MOTOR_ID, MotorType.kBrushless);
 
         // Set can timeout. Because this project only sets parameters once on
         // construction, the timeout can be long without blocking robot operation. Code
         // which sets or gets parameters during operation may need a shorter timeout.
-        SingleMotor.setCANTimeout(250);
+        DutyCycleMotor.setCANTimeout(250);
 
         // Create and apply configuration for motor. Voltage compensation helps
         // the motor behave the same as the battery
         // voltage dips. The current limit helps prevent breaker trips or burning out
         // the motor in the event the practice stalls.
         SparkMaxConfig practiceConfig = new SparkMaxConfig();
-        practiceConfig.voltageCompensation(SingleMotorConstants.SINGLE_MOTOR_VOLTAGE_COMP);
-        practiceConfig.smartCurrentLimit(SingleMotorConstants.SINGLE_MOTOR_CURRENT_LIMIT);
+        practiceConfig.voltageCompensation(DutyCycleMotorConstants.SINGLE_MOTOR_VOLTAGE_COMP);
+        practiceConfig.smartCurrentLimit(DutyCycleMotorConstants.SINGLE_MOTOR_CURRENT_LIMIT);
         // practiceConfig.idleMode(IdleMode.kBrake);
         practiceConfig.idleMode(IdleMode.kCoast);
-        SingleMotor.configure(practiceConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        DutyCycleMotor.configure(practiceConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
@@ -49,36 +49,36 @@ public class SingleMotor extends SubsystemBase {
      * 
      * @param speedmotor speed from -1.0 to 1, with 0 stopping it
      */
-    public void runSingleMotor(double speed){
-        SingleMotor.set(speed);
+    public void runDutyCycleMotor(double speed){
+        DutyCycleMotor.set(speed);
     }
 
     // Change your command methods to use runEnd
     public Command ForwordSpin() {
         return this.runEnd(
-            () -> runSingleMotor(0.5), // Run at 50% speed while held
-            () -> runSingleMotor(0.0)  // Stop the motor when released
+            () -> runDutyCycleMotor(0.5), // Run at 50% speed while held
+            () -> runDutyCycleMotor(0.0)  // Stop the motor when released
         );
     }
 
     public Command BackwardFastSpin() {
         return this.runEnd(
-            () -> runSingleMotor(-0.6), // Run reverse while held
-            () -> runSingleMotor(0.0)   // Stop the motor when released
+            () -> runDutyCycleMotor(-0.6), // Run reverse while held
+            () -> runDutyCycleMotor(0.0)   // Stop the motor when released
         );
     }
 
     public Command BackwardSlowSpin() {
         return this.runEnd(
-            () -> runSingleMotor(-0.2),
-            () -> runSingleMotor(0.0)
+            () -> runDutyCycleMotor(-0.2),
+            () -> runDutyCycleMotor(0.0)
         );
     }
 
     // The run once will have the motor continue to run until commanded to stop
     public Command ContinuousSlowForwardSpin() {
         return this.runOnce(
-            () -> runSingleMotor(-0.2)
+            () -> runDutyCycleMotor(-0.2)
         );
     }
 

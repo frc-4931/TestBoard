@@ -8,14 +8,14 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.SingleMotor;
+import frc.robot.subsystems.DutyCycleMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
-import frc.robot.subsystems.ControlledMotor;
+import frc.robot.subsystems.VelocityControlledMotor;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -26,8 +26,8 @@ import frc.robot.subsystems.ControlledMotor;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-//   private final ControlledMotor controlledMotor = new ControlledMotor();
-  private final SingleMotor singleMotor = new SingleMotor();
+  private final VelocityControlledMotor velocityControlledMotor = new VelocityControlledMotor();
+//   private final dutyCycleMotor dutyCycleMotor = new dutyCycleMotor();
   
   final         CommandXboxController driverXbox = new CommandXboxController(0);
 
@@ -58,26 +58,28 @@ public class RobotContainer {
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
     // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-    driverXbox.a().whileTrue(singleMotor.ForwordSpin());
-    driverXbox.b().whileTrue(singleMotor.BackwardSlowSpin());
-    driverXbox.x().whileTrue(singleMotor.BackwardFastSpin());
+    // driverXbox.a().whileTrue(dutyCycleMotor.ForwordSpin());
+    // driverXbox.b().whileTrue(dutyCycleMotor.BackwardSlowSpin());
+    // driverXbox.x().whileTrue(dutyCycleMotor.BackwardFastSpin());
+    driverXbox.a().whileTrue(velocityControlledMotor.BackwardSlowSpin());
+    driverXbox.b().whileTrue(velocityControlledMotor.ForwordSlowSpin());
     // These will only execute if the Robot is physically put into "Test Mode"
-    //   driverXbox.povUp().whileTrue(
-    //       controlledMotor.sysIdQuasistatic(Direction.kForward)
-    //       .onlyIf(DriverStation::isTest)
-    //   );
-    //   driverXbox.povDown().whileTrue(
-    //       controlledMotor.sysIdQuasistatic(Direction.kReverse)
-    //       .onlyIf(DriverStation::isTest)
-    //   );
-    //   driverXbox.povRight().whileTrue(
-    //       controlledMotor.sysIdDynamic(Direction.kForward)
-    //       .onlyIf(DriverStation::isTest)
-    //   );
-    //   driverXbox.povLeft().whileTrue(
-    //       controlledMotor.sysIdDynamic(Direction.kReverse)
-    //       .onlyIf(DriverStation::isTest)
-    //   );
+      driverXbox.povUp().whileTrue(
+          velocityControlledMotor.sysIdQuasistatic(Direction.kForward)
+          .onlyIf(DriverStation::isTest)
+      );
+      driverXbox.povDown().whileTrue(
+          velocityControlledMotor.sysIdQuasistatic(Direction.kReverse)
+          .onlyIf(DriverStation::isTest)
+      );
+      driverXbox.povRight().whileTrue(
+          velocityControlledMotor.sysIdDynamic(Direction.kForward)
+          .onlyIf(DriverStation::isTest)
+      );
+      driverXbox.povLeft().whileTrue(
+          velocityControlledMotor.sysIdDynamic(Direction.kReverse)
+          .onlyIf(DriverStation::isTest)
+      );
   }
 
   /**
