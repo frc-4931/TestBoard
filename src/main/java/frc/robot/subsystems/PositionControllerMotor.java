@@ -94,12 +94,16 @@ public class PositionControllerMotor extends SubsystemBase {
     public void periodic() {}
 
     public Command goToPositionCommand(double targetRotations) {
-        return runOnce(() -> {
+        // Keep continuously sending the target so our default "hold position" command doesn't
+        // immediately override it.
+        return run(() -> {
             // Use kPosition for instant PID or kSmartMotion for a smooth profiled move
             pidController.setReference(targetRotations, SparkMax.ControlType.kPosition);
         })
-        // The command is finished when the encoder is within a small range of the target
-        .until(() -> Math.abs(positionControlledMotor.getEncoder().getPosition() - targetRotations) < 0.6);
+        // The command is finished when the encoder is within a small range of the target.
+        // Use a tighter tolerance so we don't end early and immediately fall back to the
+        // hold position command.
+        .until(() -> Math.abs(positionControlledMotor.getEncoder().getPosition() - targetRotations) < 0.05);
     }
 
     public Command goToPositionWithTimeout(double targetRotations, double timeout) {
@@ -126,10 +130,13 @@ public class PositionControllerMotor extends SubsystemBase {
     }
 
     public Command nudgePositionCommand(double deltaRotations) {
-        return runOnce(() -> {
-            double newTarget = positionControlledMotor.getEncoder().getPosition() + deltaRotations;
+        // Keep commanding the target while the command is active so the subsystem doesn't
+        // immediately fall back to its default holding behavior.
+        double newTarget = positionControlledMotor.getEncoder().getPosition() + deltaRotations;
+        return run(() -> {
             pidController.setReference(newTarget, SparkMax.ControlType.kPosition);
-        });
+        })
+        .until(() -> Math.abs(positionControlledMotor.getEncoder().getPosition() - newTarget) < 0.05);
     }
 
 
