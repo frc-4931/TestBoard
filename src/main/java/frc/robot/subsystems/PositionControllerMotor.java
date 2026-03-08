@@ -38,12 +38,14 @@ public class PositionControllerMotor extends SubsystemBase {
         // motorConfig.idleMode(IdleMode.kBrake);
         motorConfig.idleMode(IdleMode.kBrake);
         motorConfig.closedLoop
-        .pid(0.001, 0, 0.0001, ClosedLoopSlot.kSlot0)
+        .pid(0.00066472, 0, 0.0001, ClosedLoopSlot.kSlot0)
         .feedForward
             .kS(0.14139)
             // .kV(0.12189)
             // .kA(a)
             // .kG(0.00099532) // kG is a linear gravity feedforward, for an elevator
+            .kS(0.14139, ClosedLoopSlot.kSlot0)
+            .kV(0.12189, ClosedLoopSlot.kSlot0)
             .kCos(0.00099532); // kCos is a cosine gravity feedforward, for an arm
             // .kCosRatio(cosRatio); // kCosRatio relates the encoder position to absolute position
         // motorConfig.closedLoop
