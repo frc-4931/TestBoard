@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.SineTest;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.DutyCycleMotor;
 
@@ -34,12 +35,13 @@ POSITION_CONTROL    // Rotation/Encoder based
  */
 public class RobotContainer {
   // Select the type of motor to use
-  private final ControlType controlType = ControlType.DUTY_CYCLE;
+  private final ControlType controlType = ControlType.VELOCITY_CONTROL;
 
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private VelocityControlledMotor velocityControlledMotor;
   private DutyCycleMotor dutyCycleMotor;
+  private SineTest sineTest;
 
 //   private final VelocityControlledMotor velocityControlledMotor = new VelocityControlledMotor();
 //   private final DutyCycleMotor dutyCycleMotor = new DutyCycleMotor();
@@ -59,6 +61,7 @@ public class RobotContainer {
       case VELOCITY_CONTROL:
         // Note: requires PID controller setup on the SparkMax
         velocityControlledMotor = new VelocityControlledMotor();
+        sineTest = new SineTest(velocityControlledMotor);
         break;
       case POSITION_CONTROL:
           break;
@@ -87,11 +90,12 @@ public class RobotContainer {
       case DUTY_CYCLE:
         driverXbox.a().whileTrue(dutyCycleMotor.ForwordSpin());
         driverXbox.b().whileTrue(dutyCycleMotor.BackwardSlowSpin());
-        driverXbox.x().whileTrue(dutyCycleMotor.BackwardFastSpin());
+        // driverXbox.x().whileTrue(dutyCycleMotor.BackwardFastSpin());
         break;
       case VELOCITY_CONTROL:
         driverXbox.a().whileTrue(velocityControlledMotor.BackwardSlowSpin());
         driverXbox.b().whileTrue(velocityControlledMotor.ForwordSlowSpin());
+        driverXbox.x().whileTrue(sineTest);
         driverXbox.povUp().whileTrue(
           velocityControlledMotor.sysIdQuasistatic(Direction.kForward)
           .onlyIf(DriverStation::isTest)
@@ -108,6 +112,7 @@ public class RobotContainer {
           velocityControlledMotor.sysIdDynamic(Direction.kReverse)
           .onlyIf(DriverStation::isTest)
           );
+        
         break;
       case POSITION_CONTROL:
           break;

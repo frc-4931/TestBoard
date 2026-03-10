@@ -20,6 +20,7 @@ public class SineTest extends Command {
   @SuppressWarnings("PMD.UnusedPrivateField")
   // private final ExampleSubsystem m_subsystem;
   private final VelocityControlledMotor vel_subsystem;
+  private double index = 0;
 
   /**
    * Creates a new ExampleCommand.
@@ -39,7 +40,10 @@ public class SineTest extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-      vel_subsystem.runSecondMotor(1000);
+    double speed = 400 * Math.sin(index*Math.PI);
+    System.out.println(speed);
+    vel_subsystem.runSecondMotor(speed);
+    index += 0.001;
   }
 
   // Called once the command ends or is interrupted.
