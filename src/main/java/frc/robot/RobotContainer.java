@@ -111,8 +111,9 @@ public class RobotContainer {
                 );
             break;
         case POSITION_CONTROL:
-            driverXbox.a().onTrue(positionMotor.goToPositionCommand(30));
-            driverXbox.b().onTrue(positionMotor.goToPositionCommand(10));
+            driverXbox.a().onTrue(positionMotor.goToPositionCommand(1));
+            driverXbox.b().onTrue(positionMotor.goToPositionCommand(.5));
+            driverXbox.y().onTrue(positionMotor.holdPositionCommandBreak());
             // Reset encoder when 'Start' is pressed
             driverXbox.start().onTrue(positionMotor.zeroEncoderCommand());
 
@@ -121,7 +122,7 @@ public class RobotContainer {
             driverXbox.povRight().onTrue(positionMotor.nudgePositionCommand(2));
 
             // DEFAULT COMMAND: Hold the motor in place when you aren't touching anything
-            positionMotor.setDefaultCommand(positionMotor.holdPositionCommand());
+            positionMotor.setDefaultCommand(positionMotor.holdPositionCommandBreak());
 
             driverXbox.povUp().whileTrue(
                 positionMotor.sysIdQuasistatic(Direction.kForward)

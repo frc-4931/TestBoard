@@ -38,7 +38,7 @@ public class PositionControllerMotor extends SubsystemBase {
         // motorConfig.idleMode(IdleMode.kBrake);
         motorConfig.idleMode(IdleMode.kBrake);
         motorConfig.closedLoop
-        .pid(0.00066472, 0, 0.0001, ClosedLoopSlot.kSlot0)
+        .pid(6.6472, 0, 0.000, ClosedLoopSlot.kSlot0)
         .feedForward
             .kS(0.14139)
             // .kV(0.12189)
@@ -130,6 +130,14 @@ public class PositionControllerMotor extends SubsystemBase {
             return run(() -> pidController.setReference(currentPos, SparkMax.ControlType.kPosition));
         });
     }
+
+        public Command holdPositionCommandBreak() {
+        // We use a local variable to "lock in" the position when the command starts
+           double currentPos = positionControlledMotor.getEncoder().getPosition();
+            return run(() -> pidController.setReference(currentPos, SparkMax.ControlType.kPosition));
+        
+    }
+
 
     public Command nudgePositionCommand(double deltaRotations) {
         // Keep commanding the target while the command is active so the subsystem doesn't
