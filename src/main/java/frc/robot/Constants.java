@@ -18,7 +18,7 @@ public final class Constants {
   }
 
   public static class DutyCycleMotorConstants {
-    public static final int SINGLE_MOTOR_ID = 21;
+    public static final int SINGLE_MOTOR_ID = 10;
     public static final double SINGLE_MOTOR_VOLTAGE_COMP = 10.0;
     public static final int SINGLE_MOTOR_CURRENT_LIMIT = 60;
   }
