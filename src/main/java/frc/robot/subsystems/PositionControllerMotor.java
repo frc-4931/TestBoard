@@ -35,18 +35,19 @@ public class PositionControllerMotor extends SubsystemBase {
         SparkMaxConfig motorConfig = new SparkMaxConfig();
         motorConfig.voltageCompensation(ControlledMotorConstants.MOTOR_VOLTAGE_COMP);
         motorConfig.smartCurrentLimit(ControlledMotorConstants.MOTOR_CURRENT_LIMIT);
+        motorConfig.closedLoop.allowedClosedLoopError(.04, ClosedLoopSlot.kSlot0);
         // motorConfig.idleMode(IdleMode.kBrake);
         motorConfig.idleMode(IdleMode.kBrake);
         motorConfig.closedLoop
-        .pid(6.6472, 0, 0.000, ClosedLoopSlot.kSlot0)
+        .pid(201.35, 0, 1.8598, ClosedLoopSlot.kSlot0)
         .feedForward
-            .kS(0.14139)
-            // .kV(0.12189)
-            // .kA(a)
-            // .kG(0.00099532) // kG is a linear gravity feedforward, for an elevator
-            .kS(0.14139, ClosedLoopSlot.kSlot0)
-            .kV(0.12189, ClosedLoopSlot.kSlot0)
-            .kCos(0.00099532); // kCos is a cosine gravity feedforward, for an arm
+            .kS(0.19118)
+            .kV(0.11393)
+            .kA(0.00983)
+            // .kG(0.0) // kG is a linear gravity feedforward, for an elevator
+            // .kS(0.14139, ClosedLoopSlot.kSlot0)
+            // .kV(0.12189, ClosedLoopSlot.kSlot0)
+            .kCos(0.012); // kCos is a cosine gravity feedforward, for an arm
             // .kCosRatio(cosRatio); // kCosRatio relates the encoder position to absolute position
         // motorConfig.closedLoop
         //     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -58,16 +59,22 @@ public class PositionControllerMotor extends SubsystemBase {
         //     .kS(0.14139, ClosedLoopSlot.kSlot0)
         //     .kV(0.12189, ClosedLoopSlot.kSlot0);
 
-        positionControlledMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         motorConfig.softLimit
             .forwardSoftLimit(20.0) // rotations
             .forwardSoftLimitEnabled(true)
             .reverseSoftLimit(0.0)
             .reverseSoftLimitEnabled(true);
-
+        positionControlledMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        
         // 3. SysId Routine Setup
         m_sysIdRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(),
+            new SysIdRoutine.Config(
+                // Volts.per(Second).of(2),
+                // Volts.of(4),
+                // Seconds.of(2),
+                // null
+
+            ),
             new SysIdRoutine.Mechanism(
                 // Unified Drive: Sending voltage to leader automatically sends it to follower
                 (voltage) -> positionControlledMotor.setVoltage(voltage.in(Volts)),

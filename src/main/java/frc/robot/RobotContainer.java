@@ -35,7 +35,7 @@ enum ControlType {
  */
 public class RobotContainer {
   // Select the type of motor to use
-  private final ControlType controlType = ControlType.POSITION_CONTROL;
+  private final ControlType controlType = ControlType.DUTY_CYCLE;
 
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
@@ -122,7 +122,7 @@ public class RobotContainer {
             driverXbox.povRight().onTrue(positionMotor.nudgePositionCommand(2));
 
             // DEFAULT COMMAND: Hold the motor in place when you aren't touching anything
-            positionMotor.setDefaultCommand(positionMotor.holdPositionCommandBreak());
+            // positionMotor.setDefaultCommand(positionMotor.holdPositionCommandBreak());
 
             driverXbox.povUp().whileTrue(
                 positionMotor.sysIdQuasistatic(Direction.kForward)
