@@ -8,6 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.PositionControllerMotor;
 import frc.robot.subsystems.DutyCycleMotor;
 
 import com.revrobotics.spark.SparkMax;
@@ -21,9 +22,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.VelocityControlledMotor;
 
 enum ControlType {
-DUTY_CYCLE,         // Percent output (-1.0 to 1.0)
-VELOCITY_CONTROL,   // RPM based
-POSITION_CONTROL    // Rotation/Encoder based
+    DUTY_CYCLE,         // Percent output (-1.0 to 1.0)
+    VELOCITY_CONTROL,   // RPM based
+    POSITION_CONTROL    // Rotation/Encoder based
 }
 
 /**
@@ -40,9 +41,7 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private VelocityControlledMotor velocityControlledMotor;
   private DutyCycleMotor dutyCycleMotor;
-
-//   private final VelocityControlledMotor velocityControlledMotor = new VelocityControlledMotor();
-//   private final DutyCycleMotor dutyCycleMotor = new DutyCycleMotor();
+  private PositionControllerMotor positionMotor;
   
   final         CommandXboxController driverXbox = new CommandXboxController(0);
 
@@ -53,15 +52,16 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (controlType) {
-      case DUTY_CYCLE:
+    case DUTY_CYCLE:
         dutyCycleMotor = new DutyCycleMotor();
         break;
-      case VELOCITY_CONTROL:
+    case VELOCITY_CONTROL:
         // Note: requires PID controller setup on the SparkMax
         velocityControlledMotor = new VelocityControlledMotor();
         break;
-      case POSITION_CONTROL:
-          break;
+    case POSITION_CONTROL:
+        positionMotor = new PositionControllerMotor();
+        break;
     }
     // Configure the trigger bindings
     configureBindings();
@@ -83,39 +83,66 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-        switch (controlType) {
-      case DUTY_CYCLE:
-        driverXbox.a().whileTrue(dutyCycleMotor.ForwordSpin());
-        driverXbox.b().whileTrue(dutyCycleMotor.BackwardSlowSpin());
-        driverXbox.x().whileTrue(dutyCycleMotor.BackwardFastSpin());
-        break;
-      case VELOCITY_CONTROL:
-        driverXbox.a().whileTrue(velocityControlledMotor.BackwardSlowSpin());
-        driverXbox.b().whileTrue(velocityControlledMotor.ForwordSlowSpin());
-        driverXbox.povUp().whileTrue(
-          velocityControlledMotor.sysIdQuasistatic(Direction.kForward)
-          .onlyIf(DriverStation::isTest)
-          );
-        driverXbox.povDown().whileTrue(
-          velocityControlledMotor.sysIdQuasistatic(Direction.kReverse)
-          .onlyIf(DriverStation::isTest)
-          );
-        driverXbox.povRight().whileTrue(
-          velocityControlledMotor.sysIdDynamic(Direction.kForward)
-          .onlyIf(DriverStation::isTest)
-          );
-        driverXbox.povLeft().whileTrue(
-          velocityControlledMotor.sysIdDynamic(Direction.kReverse)
-          .onlyIf(DriverStation::isTest)
-          );
-        break;
-      case POSITION_CONTROL:
-          break;
+    switch (controlType) {
+        case DUTY_CYCLE:
+            driverXbox.a().whileTrue(dutyCycleMotor.ForwordSpin());
+            driverXbox.b().whileTrue(dutyCycleMotor.BackwardSlowSpin());
+            driverXbox.x().whileTrue(dutyCycleMotor.BackwardFastSpin());
+            break;
+        case VELOCITY_CONTROL:
+            driverXbox.a().whileTrue(velocityControlledMotor.BackwardSlowSpin());
+            driverXbox.b().whileTrue(velocityControlledMotor.ForwordSlowSpin());
+            // These will only execute if the Robot is physically put into "Test Mode"
+            driverXbox.povUp().whileTrue(
+                velocityControlledMotor.sysIdQuasistatic(Direction.kForward)
+                .onlyIf(DriverStation::isTest)
+                );
+            driverXbox.povDown().whileTrue(
+                velocityControlledMotor.sysIdQuasistatic(Direction.kReverse)
+                .onlyIf(DriverStation::isTest)
+                );
+            driverXbox.povRight().whileTrue(
+                velocityControlledMotor.sysIdDynamic(Direction.kForward)
+                .onlyIf(DriverStation::isTest)
+                );
+            driverXbox.povLeft().whileTrue(
+                velocityControlledMotor.sysIdDynamic(Direction.kReverse)
+                .onlyIf(DriverStation::isTest)
+                );
+            break;
+        case POSITION_CONTROL:
+            driverXbox.a().onTrue(positionMotor.goToPositionCommand(1));
+            driverXbox.b().onTrue(positionMotor.goToPositionCommand(.5));
+            driverXbox.y().onTrue(positionMotor.holdPositionCommandBreak());
+            // Reset encoder when 'Start' is pressed
+            driverXbox.start().onTrue(positionMotor.zeroEncoderCommand());
+
+            // Nudge up 0.5 rotations when D-Pad Up is pressed
+            driverXbox.povUp().onTrue(positionMotor.nudgePositionCommand(5));
+            driverXbox.povRight().onTrue(positionMotor.nudgePositionCommand(2));
+
+            // DEFAULT COMMAND: Hold the motor in place when you aren't touching anything
+            // positionMotor.setDefaultCommand(positionMotor.holdPositionCommandBreak());
+
+            driverXbox.povUp().whileTrue(
+                positionMotor.sysIdQuasistatic(Direction.kForward)
+                .onlyIf(DriverStation::isTest)
+                );
+            driverXbox.povDown().whileTrue(
+                positionMotor.sysIdQuasistatic(Direction.kReverse)
+                .onlyIf(DriverStation::isTest)
+                );
+            driverXbox.povRight().whileTrue(
+                positionMotor.sysIdDynamic(Direction.kForward)
+                .onlyIf(DriverStation::isTest)
+                );
+            driverXbox.povLeft().whileTrue(
+                positionMotor.sysIdDynamic(Direction.kReverse)
+                .onlyIf(DriverStation::isTest)
+                );
+            break;
     }
     // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-
-    // These will only execute if the Robot is physically put into "Test Mode"
-
   }
 
   /**

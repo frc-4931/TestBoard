@@ -25,7 +25,7 @@ public final class Constants {
 
   public static final class ControlledMotorConstants {
         public static final int MOTOR_ID = 10;
-        public static final int MOTOR_CURRENT_LIMIT = 60;
+        public static final int MOTOR_CURRENT_LIMIT = 50;
         public static final double MOTOR_VOLTAGE_COMP = 10;
         public static final double MOTOR_SPIN = -.5;
   }
